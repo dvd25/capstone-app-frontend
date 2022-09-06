@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { NavLink } from 'react-router-dom';
+
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -112,8 +114,8 @@ export default function SignInSide() {
                     Forgot password?
                   </Link>
                 </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
+                <Grid item xs>
+                  <Link component={NavLink} to="/register" href="#" variant="body2">
                     {"Sign Up"}
                   </Link>
                 </Grid>
