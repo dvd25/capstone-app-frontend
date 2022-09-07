@@ -117,6 +117,13 @@ const ResponsiveAppBar = () => {
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Sign in
             </Button>
+            <Button
+              key='dashboard'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/dashboard"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Dashboard
+            </Button>
           </Box>
 
         </Toolbar>

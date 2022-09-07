@@ -6,7 +6,7 @@ import Blog from './components/Blog';
 import ResponsiveAppBar from './components/NavigationBar';
 import SignIn from './components/SignInPage'
 import SignUp from './components/SignUpPage';
-
+import MemberDashboard from './components/MemberDashboard';
 
 
 
@@ -19,7 +19,7 @@ function App() {
         {/* <Route path="/products" element={<Products />} /> */}
         <Route path="/signIn" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
+        <Route path="/dashboard" element={<MemberDashboard />} />
       </Routes>
     </div>
   );
