@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import Chart from './Chart';
 import ActiveMembers from './MembersCard';
-import Orders from './Orders';
+import Orders from './TasksTable';
 import TasksCard from './TasksCard';
 
 function Copyright(props) {

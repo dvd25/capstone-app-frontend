@@ -24,7 +24,7 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <AppBar position="static" style={{ background: '#2E3B55' }}>
+    <AppBar position="sticky" style={{ background: '#2E3B55' }}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <CapstoneIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -123,6 +123,13 @@ const ResponsiveAppBar = () => {
               component={NavLink} to="/dashboard"
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Dashboard
+            </Button>
+            <Button
+              key='admin-dashboard'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/admin-dashboard"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Admin Dashboard
             </Button>
           </Box>
 
