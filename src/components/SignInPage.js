@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
-
+import { useState } from 'react';
+import { Navigate, NavLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -31,14 +31,49 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
+  //states should be moved to context
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [role, setRole] = useState("");
+  //On submit will post to the server to sign in
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const data = new FormData(event.currentTarget); //input form data
+
+    try {
+      fetch("http://localhost:8080/api/users/login", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              email: data.get('email'),
+              password: data.get('password'),
+
+          })
+      }).then(res => {
+          return res.json();
+        }).then(response => {
+          console.log(response)
+          if (response.signedIn === "true"){ //isAuthorized state true if signIn is true
+            setIsAuthorized(true);
+            setRole(response.userInfo.role)
+          }
+        })
+        .catch(error => {
+          console.log(error.message);
+        });
+
+    } catch (error) {
+      console.log(error.message)
+    }
   };
+
+  if (isAuthorized === true) { //if authorized redirect user to their dashboard
+    if(role === "customer"){
+      return <Navigate replace to="/dashboard" />;
+    }
+    if(role === "admin"){
+      return <Navigate replace to="/admin-dashboard" />;
+    }
+  } 
 
   return (
     <ThemeProvider theme={theme}>
