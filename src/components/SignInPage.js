@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { useContext} from 'react';
+import { CustomContext } from "../context/Context";
 import { Navigate, NavLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -14,6 +16,11 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function Copyright(props) {
   return (
@@ -31,9 +38,23 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
-  //states should be moved to context
-  const [isAuthorized, setIsAuthorized] = useState(false);
+
+ 
+  //authentication check, will be used in the dashboard pages through context.
+  const {authenticated, setAuthenticated, setCurrentUserInfo} = useContext(CustomContext)
   const [role, setRole] = useState("");
+
+  //for handling modal
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+
+  const openAlertDialog = () => {
+    setOpen(true);
+  };
+  const handleClose = () => { //close dialog box
+    setOpen(false);
+  };
+
   //On submit will post to the server to sign in
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -51,10 +72,20 @@ export default function SignInSide() {
       }).then(res => {
           return res.json();
         }).then(response => {
-          console.log(response)
           if (response.signedIn === "true"){ //isAuthorized state true if signIn is true
-            setIsAuthorized(true);
+            setAuthenticated(true);
             setRole(response.userInfo.role)
+            setCurrentUserInfo(response.userInfo)
+          }
+          if (response.message === 'Email not found') {
+            setMessage('Email not found, maybe you would like to sign in instead?')
+            openAlertDialog();
+            return;
+          }
+          if (response.message === 'Incorrect Password') {
+            setMessage('Incorrect Password')
+            openAlertDialog();
+            return;
           }
         })
         .catch(error => {
@@ -66,7 +97,7 @@ export default function SignInSide() {
     }
   };
 
-  if (isAuthorized === true) { //if authorized redirect user to their dashboard
+  if (authenticated === true) { //if authorized redirect user to their dashboard
     if(role === "customer"){
       return <Navigate replace to="/dashboard" />;
     }
@@ -160,6 +191,26 @@ export default function SignInSide() {
           </Box>
         </Grid>
       </Grid>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Alert Dialog"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }

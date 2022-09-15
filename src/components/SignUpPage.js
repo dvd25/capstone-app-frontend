@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +13,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function Copyright(props) {
   return (
@@ -29,14 +35,57 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+
+  let navigate = useNavigate();
+
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+
+  const openAlertDialog = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => { //close dialog box
+    setOpen(false);
+  };
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    try {
+      fetch("http://localhost:8080/api/users/", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.get('email'),
+          password: data.get('password'),
+          firstName: data.get('firstName'),
+          lastName: data.get('lastName'),
+        })
+      }).then(res => {
+        return res.json();
+      }).then(response => {
+        console.log(response)
+        if (response.rejected === true) {
+          setMessage('Email already in use')
+          openAlertDialog();
+        } else {
+          setMessage('You have successfuly registered. Automatically redirecting you to sign in page... ')
+          openAlertDialog();
+          setTimeout(function () { navigate("/signIn"); }, 2000);
+          //
+        }
+      })
+        .catch(error => {
+          console.log(error.message);
+        });
+
+    } catch (error) {
+      console.log(error.message)
+    }
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -127,6 +176,26 @@ export default function SignUp() {
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Alert Dialog"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }

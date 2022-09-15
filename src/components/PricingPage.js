@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from "react";
+import { CustomContext } from "../context/Context";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -68,6 +71,10 @@ const tiers = [
 
 
 function PricingContent() {
+
+    const navigate = useNavigate();
+
+    const { currentUserInfo } = useContext(CustomContext);
     return (
         <React.Fragment>
             <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -82,14 +89,22 @@ function PricingContent() {
                     color="text.primary"
                     gutterBottom
                 >
-                    Pricing
+                    Pricing Plans
                 </Typography>
+
                 <Typography variant="h5" align="center" color="text.secondary" component="p">
                     Different membership plans to suit your needs and goals. Contact us directly if you still need something more personalised.
                 </Typography>
+                <Button type="submit" onClick={() => navigate(-1)}
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                                style={{ background: 'orange' }}>Back to dashboard</Button>
             </Container>
             {/* End hero unit */}
             <Container maxWidth="md" component="main">
+                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                    CURRENT PLAN: {currentUserInfo.membership.toUpperCase()}
+                </Typography>
                 <Grid container spacing={5} alignItems="flex-end">
                     {tiers.map((tier) => (
                         // Enterprise card is full width at sm breakpoint
@@ -151,8 +166,10 @@ function PricingContent() {
                                     </Button>
                                 </CardActions>
                             </Card>
+
                         </Grid>
                     ))}
+                    
                 </Grid>
             </Container>
             {/* Footer */}

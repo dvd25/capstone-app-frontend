@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useContext } from "react";
+import { CustomContext } from "../context/Context";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,6 +16,8 @@ import CapstoneIcon from '@mui/icons-material/ChangeHistory';
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
+
+  const { authenticated, currentUserInfo } = useContext(CustomContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -78,8 +82,16 @@ const ResponsiveAppBar = () => {
               <MenuItem component={NavLink} to="/" key='Home' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Home</Typography>
               </MenuItem>
+              {!authenticated?
               <MenuItem component={NavLink} to="/signIn" key='signIn' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Sign In</Typography>
+              </MenuItem> :null }
+              {authenticated && currentUserInfo.role === 'customer' ?
+                <MenuItem component={NavLink} to="/dashboard" key='dashboard' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Dashboard</Typography>
+              </MenuItem> : null}
+              <MenuItem component={NavLink} to="/admin-dashboard" key='admin' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Admin Dashboard</Typography>
               </MenuItem>
             </Menu>
           </Box>
@@ -110,20 +122,22 @@ const ResponsiveAppBar = () => {
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Home
             </Button>
+            {!authenticated ?
             <Button
               key='signIn'
               onClick={handleCloseNavMenu}
               component={NavLink} to="/signIn"
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Sign in
-            </Button>
-            <Button
-              key='dashboard'
-              onClick={handleCloseNavMenu}
-              component={NavLink} to="/dashboard"
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            > Dashboard
-            </Button>
+            </Button> : null}
+            {authenticated && currentUserInfo.role === 'customer' ?
+              <Button
+                key='dashboard'
+                onClick={handleCloseNavMenu}
+                component={NavLink} to="/dashboard"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              > Dashboard
+              </Button> : null}
             <Button
               key='admin-dashboard'
               onClick={handleCloseNavMenu}
