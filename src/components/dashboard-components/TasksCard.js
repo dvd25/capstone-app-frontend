@@ -19,7 +19,7 @@ export default function TasksCard() {
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
-          View All Tasks
+          Manage Tasks
         </Link>
       </div>
     </React.Fragment>

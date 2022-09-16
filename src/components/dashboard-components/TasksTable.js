@@ -1,6 +1,14 @@
 import * as React from 'react';
+import { useEffect, useReducer } from 'react';
+import { useContext } from 'react';
+import { CustomContext } from "../../context/Context";
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -21,6 +29,11 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
 
 function createData(taskId, description, comments, status, assignedTo, category, priority) {
   return {
@@ -74,6 +87,34 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+const categories = [
+  {
+    value: 'customer',
+  },
+  {
+    value: 'employee',
+  }
+];
+
+const status = [
+  {
+    value: 'unassigned',
+  },
+  {
+    value: 'pending',
+  },
+  {
+    value: 'accepted',
+  },
+  {
+    value: 'started',
+  },
+  {
+    value: 'completed',
+  }
+];
+
+
 const headCells = [
   {
     id: 'taskId',
@@ -82,16 +123,10 @@ const headCells = [
     label: 'Task ID',
   },
   {
-    id: 'description',
-    numeric: false,
-    disablePadding: true,
-    label: 'Description',
-  },
-  {
-    id: 'comments',
+    id: 'category',
     numeric: false,
     disablePadding: false,
-    label: 'Comments',
+    label: 'Category',
   },
   {
     id: 'status',
@@ -106,16 +141,28 @@ const headCells = [
     label: 'Assigned To',
   },
   {
-    id: 'category',
-    numeric: false,
-    disablePadding: false,
-    label: 'Category',
-  },
-  {
     id: 'priority',
     numeric: true,
     disablePadding: false,
     label: 'Priority',
+  },
+  {
+    id: 'description',
+    numeric: false,
+    disablePadding: true,
+    label: 'Description',
+  },
+  {
+    id: 'comments',
+    numeric: false,
+    disablePadding: false,
+    label: 'Comments',
+  },
+  {
+    id: 'edit',
+    numeric: false,
+    disablePadding: false,
+    label: 'Edit',
   },
 ];
 
@@ -177,6 +224,7 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
+  const { selected, setSelected } = useContext(CustomContext)
 
   return (
     <Toolbar
@@ -211,15 +259,16 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={() => { console.log(selected) }}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton >
             <FilterListIcon />
           </IconButton>
+
         </Tooltip>
       )}
     </Toolbar>
@@ -233,10 +282,54 @@ EnhancedTableToolbar.propTypes = {
 export default function EnhancedTable() {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
+  //const [selected, setSelected] = React.useState([]);
+  const { selected, setSelected } = useContext(CustomContext)
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  //for managing the drop down menus in the task edit form
+  const [currentCategory, setCurrentCategory] = React.useState('');
+  const [currentStatus, setCurrentStatus] = React.useState('');
+  const [currentDescription, setCurrentDescription] = React.useState('Description');
+  const [currentPlaceholder, setCurrentPlaceholder] = React.useState('');
+  const [currentComments, setCurrentComments] = React.useState('');
+
+  const handleCategoryChange = (event) => {
+    setCurrentCategory(event.target.value);
+  };
+
+  const handleStatusChange = (event) => {
+    setCurrentStatus(event.target.value);
+  };
+
+  const handleDescriptionChange = (event) => {
+    setCurrentDescription(event.target.value);
+  };
+
+  const handleCommentsChange = (event) => {
+    setCurrentComments(event.target.value);
+  };
+
+  //dialog post form
+  const [openForm, setOpenForm] = React.useState(false);
+  const handleClickOpenForm = (row) => {
+    setOpenForm(true);
+    setCurrentCategory(row.category)
+    setCurrentStatus(row.status)
+    setCurrentDescription(row.description)
+    setCurrentPlaceholder(row.description)
+    setCurrentComments(row.comments)
+    console.log(row);
+  };
+
+  const handleCloseForm = () => {
+    setOpenForm(false);
+  };
+
+  const handleSubmit = () => {
+    console.log("handling submit")
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -246,7 +339,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.taskId);
+      const newSelected = state.tasks.map((n) => n.taskId);
       setSelected(newSelected);
       return;
     }
@@ -292,6 +385,53 @@ export default function EnhancedTable() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+  const initialState = {
+    loading: true, //true when loading and no data in post
+    tasks: [], //empty
+    error: ''
+  }
+
+  const reducer = (state, action) => { // reducer function for fetching api
+    switch (action.type) {
+      case 'FETCH_SUCCESS':
+        return {
+          loading: false,
+          tasks: action.payload,
+          error: ''
+        }
+      case 'FETCH_ERROR':
+        return {
+          loading: false,
+          tasks: {},
+          error: 'Something went wrong'
+        }
+      default:
+        return {
+          tasks: {}
+        }
+    }
+  }
+
+  useEffect(() => {
+
+    const URL = `http://localhost:8080/api/tasks`
+    axios.get(URL)
+      .then(response => {
+        dispatch({ type: "FETCH_SUCCESS", payload: (response.data) })
+        console.log("Finished dispatch")
+      })
+      .catch(error => {
+        dispatch({ type: "FETCH_ERROR" })
+      })
+
+  }, [] //renders once
+  )
+
+  const [state, dispatch] = useReducer(reducer, initialState) //useReducer hook for api call
+
+  console.log(state)
+
+
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -313,7 +453,7 @@ export default function EnhancedTable() {
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(rows, getComparator(order, orderBy))
+              {stableSort(state.tasks, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.taskId);
@@ -346,12 +486,13 @@ export default function EnhancedTable() {
                       >
                         {row.taskId}
                       </TableCell>
-                      <TableCell align="right">{row.description}</TableCell>
-                      <TableCell align="right">{row.comments}</TableCell>
+                      <TableCell align="right">{row.category}</TableCell>
                       <TableCell align="right">{row.status}</TableCell>
                       <TableCell align="right">{row.assignedTo}</TableCell>
-                      <TableCell align="right">{row.category}</TableCell>
                       <TableCell align="right">{row.priority}</TableCell>
+                      <TableCell align="right">{row.description}</TableCell>
+                      <TableCell align="right">{row.comments}</TableCell>
+                      <TableCell align="right"><Button color='success' onClick={() => handleClickOpenForm(row)}>Edit</Button></TableCell>
                     </TableRow>
                   );
                 })}
@@ -365,6 +506,105 @@ export default function EnhancedTable() {
                 </TableRow>
               )}
             </TableBody>
+            <Dialog open={openForm} onClose={handleCloseForm}>
+              <DialogTitle>Edit Task </DialogTitle>
+              <DialogContent>
+                <Container component="main" maxWidth="xs">
+                  <CssBaseline />
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
+
+                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            id="outlined-select-category"
+                            select
+                            fullWidth
+                            label="Category"
+                            value={currentCategory}
+                            onChange={handleCategoryChange}
+                            helperText="Category"
+                          >
+                            {categories.map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.value}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            id="outlined-select-status"
+                            select
+                            fullWidth
+                            label="Status"
+                            value={currentStatus}
+                            onChange={handleStatusChange}
+                            helperText="Status"
+                          >
+                            {status.map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.value}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            id="filled-textarea-description"
+                            label="Description"
+                            placeholder={currentPlaceholder}
+                            multiline
+                            onChange={handleDescriptionChange}
+                            value={currentDescription}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            id="filled-textarea-comments"
+                            label="Notes"
+                            placeholder="Notes..."
+                            multiline
+                            onChange={handleCommentsChange}
+                            value={currentComments}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 1 }}
+                        style={{ background: '#2E3B55' }}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        onClick={handleCloseForm}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 1, mb: 2 }}
+                        style={{ background: '#f44336' }}
+                      >
+                        Cancel
+                      </Button>
+
+
+                    </Box>
+                  </Box>
+                </Container>
+              </DialogContent>
+            </Dialog>
           </Table>
         </TableContainer>
         <TablePagination
@@ -382,7 +622,9 @@ export default function EnhancedTable() {
         label="Dense padding"
       />
     </Box>
+
   );
+
 }
 
 

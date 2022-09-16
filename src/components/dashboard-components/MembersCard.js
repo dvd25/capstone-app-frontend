@@ -19,7 +19,7 @@ export default function ActiveMembers() {
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
-          View All Members
+          Manage Members
         </Link>
       </div>
     </React.Fragment>
