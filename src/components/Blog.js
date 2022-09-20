@@ -6,15 +6,13 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Header from './Header';
-import MainFeaturedPost from './MainFeaturedPost';
-import FeaturedPost from './FeaturedPost';
-import Main from './Main';
-import Sidebar from './Sidebar';
-import Footer from './Footer';
-import post1 from './blog-post.1.md';
-import post2 from './blog-post.2.md';
-import post3 from './blog-post.3.md';
+import Header from './blog-components/Header';
+import MainFeaturedPost from './blog-components/MainFeaturedPost';
+import FeaturedPost from './blog-components/FeaturedPost';
+import Main from './blog-components/Main';
+import Sidebar from './blog-components/Sidebar';
+import Footer from './blog-components/Footer';
+
 
 const sections = [
   { title: 'Locations', url: '#' },
@@ -28,7 +26,7 @@ const sections = [
 const mainFeaturedPost = {
   title: 'Capstone Fitness',
   description:
-    "World Class Trainers, Facilities and Equipments.",
+    "We have World Class Trainers, Facilities and Equipments.",
   image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
   imageText: 'main image description',
   linkText: '',
@@ -47,13 +45,11 @@ const featuredPosts = [
     title: 'Current Deals',
     date: 'September 2',
     description:
-      'No joining fee for the whole of September. Call or come in to enquire for more information.',
+      'No joining fee for the whole of September. Call or come in to enquire with our friendly staff for more information.',
     image: 'https://images.unsplash.com/photo-1485727749690-d091e8284ef3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80',
     imageLabel: 'Image Text',
   },
 ];
-
-const posts = [post1, post2, post3];
 
 const sidebar = {
   title: 'About',
@@ -86,7 +82,7 @@ export default function Blog() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="Blog" sections={sections} />
+        <Header title="Capstone" sections={sections} />
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
           <Grid container spacing={2}>
@@ -95,7 +91,7 @@ export default function Blog() {
             ))}
           </Grid>
           <Grid container spacing={3} sx={{ mt: 3 }}>
-            <Main title="From the firehose" posts={posts} />
+            <Main title="Latest News"/>
             <Sidebar
               title={sidebar.title}
               description={sidebar.description}
@@ -107,7 +103,7 @@ export default function Blog() {
       </Container>
       <Footer
         title="Footer"
-        description="Something here to give the footer a purpose!"
+        description="Images are from Unsplash and used a MUI blog template as the base for this landing page."
       />
     </ThemeProvider>
   );

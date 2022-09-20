@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { NavLink } from 'react-router-dom';
+import { useContext } from "react";
+import { CustomContext } from "../context/Context";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,36 +10,25 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import CapstoneIcon from '@mui/icons-material/ChangeHistory';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const { authenticated, currentUserInfo } = useContext(CustomContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   return (
-    <AppBar position="static" style={{ background: '#2E3B55' }}>
+    <AppBar position="sticky" style={{ background: '#2E3B55' }}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <CapstoneIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -87,11 +79,20 @@ const ResponsiveAppBar = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
+              <MenuItem component={NavLink} to="/" key='Home' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Home</Typography>
+              </MenuItem>
+              {!authenticated?
+              <MenuItem component={NavLink} to="/signIn" key='signIn' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Sign In</Typography>
+              </MenuItem> :null }
+              {authenticated && currentUserInfo.role === 'customer' ?
+                <MenuItem component={NavLink} to="/dashboard" key='dashboard' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Dashboard</Typography>
+              </MenuItem> : null}
+              <MenuItem component={NavLink} to="/admin-dashboard" key='admin' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Admin Dashboard</Typography>
+              </MenuItem>
             </Menu>
           </Box>
           <CapstoneIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -111,49 +112,41 @@ const ResponsiveAppBar = () => {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            CAPSTONE
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            <Button
+              key='home'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Home
+            </Button>
+            {!authenticated ?
+            <Button
+              key='signIn'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/signIn"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Sign in
+            </Button> : null}
+            {authenticated && currentUserInfo.role === 'customer' ?
               <Button
-                key={page}
+                key='dashboard'
                 onClick={handleCloseNavMenu}
+                component={NavLink} to="/dashboard"
                 sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+              > Dashboard
+              </Button> : null}
+            <Button
+              key='admin-dashboard'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/admin-dashboard"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Admin Dashboard
+            </Button>
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
         </Toolbar>
       </Container>
     </AppBar>
