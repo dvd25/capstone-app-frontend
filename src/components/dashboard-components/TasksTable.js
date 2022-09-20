@@ -93,7 +93,7 @@ const status = [
   }
 ];
 
-const priorityArray = [1,2,3,4,5]
+const priorityArray = [1, 2, 3, 4, 5]
 
 
 const headCells = [
@@ -273,7 +273,7 @@ export default function EnhancedTable() {
   //for managing the drop down menus in the task edit form
   const [currentCategory, setCurrentCategory] = React.useState('');
   const [currentStatus, setCurrentStatus] = React.useState('');
-  const [currentDescription, setCurrentDescription] = React.useState('Description');
+  const [currentDescription, setCurrentDescription] = React.useState('');
   const [currentPlaceholder, setCurrentPlaceholder] = React.useState('');
   const [currentComments, setCurrentComments] = React.useState('');
   const [currentPriority, setCurrentPriority] = React.useState('');
@@ -337,7 +337,7 @@ export default function EnhancedTable() {
           priority: currentPriority
         })
       }).then(res => {
-        if(!res.ok) throw new Error(res.status);
+        if (!res.ok) throw new Error(res.status);
         else return res.json();
       }).then(response => {
         console.log('Successfully updated task')
@@ -404,14 +404,14 @@ export default function EnhancedTable() {
 
   const isSelected = (taskId) => selected.indexOf(taskId) !== -1;
 
-  
+
 
   const initialState = {
     loading: true, //true when loading and no data in post
     tasks: [], //empty
     error: ''
   }
-  
+
 
   const reducer = (state, action) => { // reducer function for fetching api
     switch (action.type) {

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import axios from 'axios'
+import { useEffect, useReducer } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -30,7 +32,96 @@ const mdTheme = createTheme();
 
 function DashboardContent() {
 
+  const initialState = {
+    loading: true, //true when loading and no data in post
+    tasks: [], //empty
+    error: ''
+  }
+  
+  const taskReducer = (taskState, action) => { // reducer function for fetching api
+    switch (action.type) {
+      case 'FETCH_SUCCESS':
+        return {
+          loading: false,
+          tasks: action.payload,
+          error: ''
+        }
+      case 'FETCH_ERROR':
+        return {
+          loading: false,
+          tasks: {},
+          error: 'Something went wrong'
+        }
+      default:
+        return {
+          tasks: {}
+        }
+    }
+  }
+  const userReducer = (userState, action) => { // reducer function for fetching api
+    switch (action.type) {
+      case 'FETCH_SUCCESS':
+        return {
+          loading: false,
+          tasks: action.payload,
+          error: ''
+        }
+      case 'FETCH_ERROR':
+        return {
+          loading: false,
+          tasks: {},
+          error: 'Something went wrong'
+        }
+      default:
+        return {
+          tasks: {}
+        }
+    }
+  }
 
+  const [taskState, taskDispatch] = useReducer(taskReducer, initialState) //useReducer hook for api call
+  const [userState, userDispatch] = useReducer(userReducer, initialState) //useReducer hook for api call
+  //fetching all tasks to use for all the child components
+  useEffect(() => {
+    const TASK_API_URL = 'http://localhost:8080/api/tasks/'
+    const USER_API_URL = 'http://localhost:8080/api/users/'
+
+    const fetchTaskData = () => {
+      try {
+        axios.get(TASK_API_URL)
+          .then(response => {
+            taskDispatch({ type: "FETCH_SUCCESS", payload: (response.data) })
+            console.log("Fetch All Tasks Successful")
+          })
+          .catch(error => {
+            taskDispatch({ type: "FETCH_ERROR" })
+          })
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    //fetches all users
+    const fetchUserData = () => {
+      try {
+        axios.get(USER_API_URL)
+          .then(response => {
+            userDispatch({ type: "FETCH_SUCCESS", payload: (response.data) })
+            console.log("Fetch All Users Successful")
+            console.log(response.data)
+          })
+          .catch(error => {
+            userDispatch({ type: "FETCH_ERROR" })
+          })
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    fetchTaskData();
+    fetchUserData();
+  }, [])
+  //console.log(userState)
+  const TASK_CARD_PROPS = {tasks: taskState.tasks, users: userState.tasks}
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -62,20 +153,7 @@ function DashboardContent() {
                 >
                   <Chart />
                 </Paper>
-              </Grid> 
-              {/* {/* Chart */}
-              {/* <Grid item xs={12} md={8} lg={6}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <BarRechart/>
-                </Paper>
-              </Grid> */}
+              </Grid>
               {/* Recent Deposits */}
               <Grid item xs={12} md={4} lg={3}>
                 <Paper
@@ -86,7 +164,7 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <ActiveMembers />
+                  <ActiveMembers users={userState.tasks}/>
                 </Paper>
               </Grid>
               <Grid item xs={12} md={4} lg={3}>
@@ -98,10 +176,10 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <TasksCard/>
+                  <TasksCard data={TASK_CARD_PROPS}/>
                 </Paper>
               </Grid>
-              {/* Recent Orders */}
+              {/* Total Tasks */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Orders />
