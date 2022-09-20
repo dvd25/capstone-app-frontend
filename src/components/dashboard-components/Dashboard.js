@@ -18,7 +18,7 @@ function Copyright(props) {
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        Capstone Fitness
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -62,7 +62,20 @@ function DashboardContent() {
                 >
                   <Chart />
                 </Paper>
-              </Grid>
+              </Grid> 
+              {/* {/* Chart */}
+              {/* <Grid item xs={12} md={8} lg={6}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <BarRechart/>
+                </Paper>
+              </Grid> */}
               {/* Recent Deposits */}
               <Grid item xs={12} md={4} lg={3}>
                 <Paper

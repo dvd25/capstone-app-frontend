@@ -35,27 +35,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
 
-function createData(taskId, description, comments, status, assignedTo, category, priority) {
-  return {
-    taskId, description, comments, status, assignedTo, category, priority
-  };
-}
-
-const rows = [
-  createData(1, "Check up with customer", "Follow up asap", "Completed", "David", "New Customer", 5),
-  createData(2, "Edit customers 123 details", "", "Ongoing", "David", "Update Customer", 3),
-  createData(3, "Cancel customer 2012 membership", "", "Unreviewed", "Tommy", "Delete Customer", 4),
-  createData(4, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(5, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(6, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(72, "Filler", "", "Unreviewed", "Alan", "Delete Customer", 4),
-  createData(8, "Filler", "", "Unreviewed", "Sam", "Delete Customer", 2),
-  createData(9, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(10, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(321, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-  createData(12, "Filler", "", "Unreviewed", "Tommy", "Delete Customer", 2),
-
-];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -113,6 +92,8 @@ const status = [
     value: 'completed',
   }
 ];
+
+const priorityArray = [1,2,3,4,5]
 
 
 const headCells = [
@@ -253,7 +234,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Your Assigned Tasks
+          All Tasks
         </Typography>
       )}
 
@@ -287,6 +268,7 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [fetchUpdateCount, setFetchUpdateCount] = React.useState(0);
 
   //for managing the drop down menus in the task edit form
   const [currentCategory, setCurrentCategory] = React.useState('');
@@ -294,6 +276,9 @@ export default function EnhancedTable() {
   const [currentDescription, setCurrentDescription] = React.useState('Description');
   const [currentPlaceholder, setCurrentPlaceholder] = React.useState('');
   const [currentComments, setCurrentComments] = React.useState('');
+  const [currentPriority, setCurrentPriority] = React.useState('');
+  const [currentAssignee, setCurrentAssignee] = React.useState('');
+  const [currentTaskId, setCurrentTaskId] = React.useState('');
 
   const handleCategoryChange = (event) => {
     setCurrentCategory(event.target.value);
@@ -311,15 +296,22 @@ export default function EnhancedTable() {
     setCurrentComments(event.target.value);
   };
 
+  const handlePriorityChange = (event) => {
+    setCurrentPriority(event.target.value);
+  };
+
   //dialog post form
   const [openForm, setOpenForm] = React.useState(false);
   const handleClickOpenForm = (row) => {
     setOpenForm(true);
+    setCurrentTaskId(row.taskId)
     setCurrentCategory(row.category)
     setCurrentStatus(row.status)
     setCurrentDescription(row.description)
     setCurrentPlaceholder(row.description)
     setCurrentComments(row.comments)
+    setCurrentPriority(row.priority)
+    setCurrentAssignee(row.assignedTo)
     console.log(row);
   };
 
@@ -327,8 +319,39 @@ export default function EnhancedTable() {
     setOpenForm(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmitUpdateTask = (event) => {
     console.log("handling submit")
+    event.preventDefault();
+    const data = new FormData(event.currentTarget)
+    console.log(data)
+    try {
+      fetch(`http://localhost:8080/api/tasks/${currentTaskId}`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: currentCategory,
+          description: currentDescription,
+          comments: currentComments,
+          status: currentStatus,
+          assignedTo: currentAssignee,
+          priority: currentPriority
+        })
+      }).then(res => {
+        if(!res.ok) throw new Error(res.status);
+        else return res.json();
+      }).then(response => {
+        console.log('Successfully updated task')
+        setFetchUpdateCount(prevState => prevState + 1)
+        handleCloseForm()
+      })
+        .catch(error => {
+          console.log(error.message);
+        });
+
+    } catch (error) {
+      console.log(error.message)
+    }
+
   }
 
   const handleRequestSort = (event, property) => {
@@ -381,15 +404,14 @@ export default function EnhancedTable() {
 
   const isSelected = (taskId) => selected.indexOf(taskId) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  
 
   const initialState = {
     loading: true, //true when loading and no data in post
     tasks: [], //empty
     error: ''
   }
+  
 
   const reducer = (state, action) => { // reducer function for fetching api
     switch (action.type) {
@@ -424,14 +446,14 @@ export default function EnhancedTable() {
         dispatch({ type: "FETCH_ERROR" })
       })
 
-  }, [] //renders once
+  }, [fetchUpdateCount] //renders once at the beginning then everytime a task gets updated
   )
 
   const [state, dispatch] = useReducer(reducer, initialState) //useReducer hook for api call
 
-  console.log(state)
 
-
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - state.tasks.length) : 0;
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -448,7 +470,7 @@ export default function EnhancedTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={state.tasks.length}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -506,6 +528,8 @@ export default function EnhancedTable() {
                 </TableRow>
               )}
             </TableBody>
+
+            {/* Edit Task Form starts here */}
             <Dialog open={openForm} onClose={handleCloseForm}>
               <DialogTitle>Edit Task </DialogTitle>
               <DialogContent>
@@ -520,7 +544,7 @@ export default function EnhancedTable() {
                     }}
                   >
 
-                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                    <Box component="form" noValidate onSubmit={handleSubmitUpdateTask} sx={{ mt: 1 }}>
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -552,6 +576,23 @@ export default function EnhancedTable() {
                             {status.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
                                 {option.value}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            id="outlined-select-priority"
+                            select
+                            fullWidth
+                            label="Priority"
+                            value={currentPriority}
+                            onChange={handlePriorityChange}
+                            helperText="Priority"
+                          >
+                            {priorityArray.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
                               </MenuItem>
                             ))}
                           </TextField>
@@ -605,12 +646,13 @@ export default function EnhancedTable() {
                 </Container>
               </DialogContent>
             </Dialog>
+            {/* Edit Task Form ends here */}
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={state.tasks.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
