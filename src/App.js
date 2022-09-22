@@ -9,6 +9,7 @@ import SignUp from './components/SignUpPage';
 import MemberDashboard from './components/MemberDashboard';
 import Pricing from './components/PricingPage';
 import Dashboard from './components/dashboard-components/Dashboard';
+import ContactPage from './components/dashboard-components/ContactPage';
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/dashboard" element={<MemberDashboard />} />
         <Route path="/pricing" element={<Pricing/>} />
         <Route path="/admin-dashboard" element={<Dashboard/>} />
+        <Route path="/contact" element={<ContactPage/>} />
       </Routes>
     </div>
   );

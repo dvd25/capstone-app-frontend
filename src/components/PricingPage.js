@@ -15,6 +15,11 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Container from '@mui/material/Container';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 
 function Copyright(props) {
@@ -73,8 +78,57 @@ const tiers = [
 function PricingContent() {
 
     const navigate = useNavigate();
+    const { currentUserInfo } = useContext(CustomContext)
+    const [open, setOpen] = React.useState(false);
+    const [alertMessage, setAlertMessage] = React.useState(false);
+    const [request, setRequest] = React.useState(false);
+    const [requestedPlan, setRequestedPlan] = React.useState('');
 
-    const { currentUserInfo } = useContext(CustomContext);
+    const handleClose = () => { //close dialog box
+        setOpen(false);
+    };
+
+    const handleClick = (tier) => {
+        console.log(tier)
+        console.log(currentUserInfo)
+        if (request === true){ //if a plan change already requested alert the user
+            setAlertMessage(`You have already submitted a plan change request to ${requestedPlan}. If you need any further actions please contact the team during staff hours.`);
+            setOpen(true)
+        }
+        else {
+            try {
+                fetch(`http://localhost:8080/api/tasks`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category: 'customer',
+                        description: `Customer ${currentUserInfo.id} make a request to change to ${tier.title} plan`,
+                        comments: `Email: ${currentUserInfo.email}`,
+                        status: 'unassigned',
+                        assignedTo: '1',
+                        priority: 5
+                    })
+                }).then(res => {
+                    if (!res.ok) throw new Error(res.status);
+                    else return res.json();
+                }).then(response => {
+                    console.log("Task created successfuly")
+                    setAlertMessage('Your request to change plan has been recieved. Our staff will get back to you within 48hrs.')
+                    setOpen(true)
+                    setRequest(true)
+                    setRequestedPlan(tier.title)
+                })
+                    .catch(error => {
+                        console.log(error.message);
+                    });
+    
+            } catch (error) {
+                console.log(error.message)
+            }
+        }
+        
+    }
+
     return (
         <React.Fragment>
             <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
@@ -96,9 +150,9 @@ function PricingContent() {
                     Different membership plans to suit your needs and goals. Contact us directly if you still need something more personalised.
                 </Typography>
                 <Button type="submit" onClick={() => navigate(-1)}
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                                style={{ background: 'orange' }}>Back to dashboard</Button>
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    style={{ background: 'orange' }}>Back to dashboard</Button>
             </Container>
             {/* End hero unit */}
             <Container maxWidth="md" component="main">
@@ -161,7 +215,7 @@ function PricingContent() {
                                     </ul>
                                 </CardContent>
                                 <CardActions>
-                                    <Button fullWidth variant={tier.buttonVariant}>
+                                    <Button onClick={() => handleClick(tier)} fullWidth variant={tier.buttonVariant}>
                                         {tier.buttonText}
                                     </Button>
                                 </CardActions>
@@ -169,7 +223,27 @@ function PricingContent() {
 
                         </Grid>
                     ))}
-                    
+                    <Dialog
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">
+                            {"Alert Dialog"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                {alertMessage}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} autoFocus>
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
                 </Grid>
             </Container>
             {/* Footer */}
