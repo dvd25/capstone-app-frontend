@@ -20,7 +20,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CallIcon from '@mui/icons-material/Call';
-import {send} from 'emailjs-com'
+import { send } from 'emailjs-com'
 
 function Copyright(props) {
     return (
@@ -41,13 +41,23 @@ function ContactPage(props) {
     const [toSend, setToSend] = useState({
         from_name: '',
         to_name: '',
+        number: '',
+        email: '',
         message: '',
         reply_to: '',
-      });
+    });
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        console.log(data.get('description'))
+        setToSend({ from_name: data.get('name'), to_name: 'admin', number: data.get('number'), email: data.get('email'), message: data.get('description'), reply_to: 'reply to' })
+        send('service_v1yms9g', 'template_xyovbdd', toSend, 'BZDMgWPp4yzOEfhNZ')
+            .then((response) => {
+                console.log('SUCCESS!', response.status, response.text);
+            }, (err) => {
+                console.log('FAILED...', err);
+            });
     };
 
     return (
@@ -66,7 +76,7 @@ function ContactPage(props) {
                         <CallIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Contact Us 
+                        Contact Us
                     </Typography>
                     <Typography component="h1" variant="subtitle1">
                         Leave your details and your enquiry below.
@@ -105,14 +115,15 @@ function ContactPage(props) {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            id="description"
-                            label="Description"
-                            placeholder="Leave a message..."
-                            multiline
-                          />
-                        </Grid>
+                                <TextField
+                                    fullWidth
+                                    name='description'
+                                    id="description"
+                                    label="Description"
+                                    placeholder="Leave a message..."
+                                    multiline
+                                />
+                            </Grid>
                             <Grid item xs={12}>
 
                             </Grid>
