@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { useEffect, useReducer } from 'react';
 import { useContext } from 'react';
 import { CustomContext } from "../../context/Context";
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -27,7 +25,7 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { visuallyHidden } from '@mui/utils';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -205,7 +203,7 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
-  const { selected, setSelected } = useContext(CustomContext)
+  const { selected, setSelected, setFetchCallCount} = useContext(CustomContext)
 
   return (
     <Toolbar
@@ -245,9 +243,9 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton >
-            <FilterListIcon />
+        <Tooltip title="Refresh table">
+          <IconButton onClick={()=>setFetchCallCount(prevState => prevState + 1)} >
+            <RefreshIcon />
           </IconButton>
 
         </Tooltip>
@@ -260,15 +258,14 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function EnhancedTable(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   //const [selected, setSelected] = React.useState([]);
-  const { selected, setSelected } = useContext(CustomContext)
+  const { selected, setSelected, setFetchCallCount } = useContext(CustomContext)
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [fetchUpdateCount, setFetchUpdateCount] = React.useState(0);
 
   //for managing the drop down menus in the task edit form
   const [currentCategory, setCurrentCategory] = React.useState('');
@@ -341,7 +338,7 @@ export default function EnhancedTable() {
         else return res.json();
       }).then(response => {
         console.log('Successfully updated task')
-        setFetchUpdateCount(prevState => prevState + 1)
+        setFetchCallCount(prevState => prevState + 1)
         handleCloseForm()
       })
         .catch(error => {
@@ -362,7 +359,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = state.tasks.map((n) => n.taskId);
+      const newSelected = props.tasks.map((n) => n.taskId);
       setSelected(newSelected);
       return;
     }
@@ -406,54 +403,8 @@ export default function EnhancedTable() {
 
 
 
-  const initialState = {
-    loading: true, //true when loading and no data in post
-    tasks: [], //empty
-    error: ''
-  }
-
-
-  const reducer = (state, action) => { // reducer function for fetching api
-    switch (action.type) {
-      case 'FETCH_SUCCESS':
-        return {
-          loading: false,
-          tasks: action.payload,
-          error: ''
-        }
-      case 'FETCH_ERROR':
-        return {
-          loading: false,
-          tasks: {},
-          error: 'Something went wrong'
-        }
-      default:
-        return {
-          tasks: {}
-        }
-    }
-  }
-
-  useEffect(() => {
-
-    const URL = `http://localhost:8080/api/tasks`
-    axios.get(URL)
-      .then(response => {
-        dispatch({ type: "FETCH_SUCCESS", payload: (response.data) })
-        console.log("Finished dispatch")
-      })
-      .catch(error => {
-        dispatch({ type: "FETCH_ERROR" })
-      })
-
-  }, [fetchUpdateCount] //renders once at the beginning then everytime a task gets updated
-  )
-
-  const [state, dispatch] = useReducer(reducer, initialState) //useReducer hook for api call
-
-
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - state.tasks.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.tasks.length) : 0;
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -470,12 +421,12 @@ export default function EnhancedTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={state.tasks.length}
+              rowCount={props.tasks.length}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(state.tasks, getComparator(order, orderBy))
+              {stableSort(props.tasks, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.taskId);
@@ -652,7 +603,7 @@ export default function EnhancedTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={state.tasks.length}
+          count={props.tasks.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

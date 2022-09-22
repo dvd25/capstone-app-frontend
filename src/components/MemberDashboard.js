@@ -158,7 +158,7 @@ export default function MemberDashboard() {
                     <Grid container spacing={4}>
                         <Grid item xs={12} sm={6} md={4} >
                             <Card
-                                sx={{ maxHeight: '100%', display: 'flex', flexDirection: 'column' }}
+                                sx={{ textAlign: 'left', maxHeight: '100%', display: 'flex', flexDirection: 'column' }}
                             >
                                 <CardContent sx={{ flexGrow: 1 }} >
                                     <Typography gutterBottom variant="h5" component="h2">
@@ -295,6 +295,7 @@ export default function MemberDashboard() {
                                                 name="firstName"
                                                 required
                                                 fullWidth
+                                                defaultValue={currentUserInfo.firstName}
                                                 id="firstName"
                                                 label="First Name"
                                                 autoFocus
@@ -305,6 +306,7 @@ export default function MemberDashboard() {
                                                 required
                                                 fullWidth
                                                 id="lastName"
+                                                defaultValue={currentUserInfo.lastName}
                                                 label="Last Name"
                                                 name="lastName"
                                                 autoComplete="family-name"
@@ -315,6 +317,7 @@ export default function MemberDashboard() {
                                                 required
                                                 fullWidth
                                                 id="email"
+                                                defaultValue={currentUserInfo.email}
                                                 label="Email Address"
                                                 name="email"
                                                 autoComplete="email"

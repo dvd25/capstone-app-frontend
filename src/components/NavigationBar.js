@@ -90,8 +90,12 @@ const ResponsiveAppBar = () => {
                 <MenuItem component={NavLink} to="/dashboard" key='dashboard' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Dashboard</Typography>
               </MenuItem> : null}
+              {authenticated && currentUserInfo.role === 'admin' ?
               <MenuItem component={NavLink} to="/admin-dashboard" key='admin' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Admin Dashboard</Typography>
+              </MenuItem> : null}
+              <MenuItem component={NavLink} to="/contact" key='contact' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Contact Us</Typography>
               </MenuItem>
             </Menu>
           </Box>
@@ -138,12 +142,20 @@ const ResponsiveAppBar = () => {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               > Dashboard
               </Button> : null}
+              {authenticated && currentUserInfo.role === 'admin' ?
             <Button
               key='admin-dashboard'
               onClick={handleCloseNavMenu}
               component={NavLink} to="/admin-dashboard"
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Admin Dashboard
+            </Button> : null}
+            <Button
+              key='contact'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/contact"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Contact Us
             </Button>
           </Box>
 

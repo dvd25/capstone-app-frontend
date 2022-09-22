@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useContext } from 'react';
+import { CustomContext } from "../../context/Context";
 import Typography from '@mui/material/Typography';
 import Title from './Title';
 import Button from '@mui/material/Button';
@@ -88,7 +90,7 @@ function TasksCard(props) {
     setOpenForm(false);
   };
 
-
+  const { setFetchCallCount } = useContext(CustomContext) //context hook to trigger api call from parent component
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(currentAssignee)
@@ -98,7 +100,7 @@ function TasksCard(props) {
     // const password = data.get('password')
     // const firstName = data.get('firstName')
     // const lastName = data.get('lastName')
-
+    
     try {
       fetch(`http://localhost:8080/api/tasks`, {
         method: "POST",
@@ -116,7 +118,7 @@ function TasksCard(props) {
         else return res.json();
       }).then(response => {
         console.log("Task created successfuly")
-        console.log(response)
+        setFetchCallCount(prevState => prevState + 1);
         handleCloseForm();
 
       })
@@ -128,7 +130,8 @@ function TasksCard(props) {
       console.log(error.message)
     }
   };
-
+  
+    
   return (
     <React.Fragment>
       <Title>Total Tasks</Title>
@@ -261,7 +264,7 @@ function TasksCard(props) {
                   sx={{ mt: 3, mb: 1 }}
                   style={{ background: '#2E3B55' }}
                 >
-                  Update
+                  Create
                 </Button>
                 <Button
                   onClick={handleCloseForm}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { useContext} from 'react';
+import { useContext } from 'react';
 import { CustomContext } from "../context/Context";
 import { Navigate, NavLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
@@ -39,9 +39,9 @@ const theme = createTheme();
 
 export default function SignInSide() {
 
- 
+
   //authentication check, will be used in the dashboard pages through context.
-  const {authenticated, setAuthenticated, setCurrentUserInfo} = useContext(CustomContext)
+  const { authenticated, setAuthenticated, setCurrentUserInfo } = useContext(CustomContext)
   const [role, setRole] = useState("");
 
   //for handling modal
@@ -60,34 +60,41 @@ export default function SignInSide() {
     event.preventDefault();
     const data = new FormData(event.currentTarget); //input form data
 
+    if (data.get('email').length === 0 || data.get('password').length === 0) {
+      console.log("Empty email or password fields on submit")
+      setMessage('You have entered empty values for your email or password. Please try again.')
+      openAlertDialog();
+      return
+    }
+
     try {
       fetch("http://localhost:8080/api/users/login", {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              email: data.get('email'),
-              password: data.get('password'),
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.get('email'),
+          password: data.get('password'),
 
-          })
-      }).then(res => {
-          return res.json();
-        }).then(response => {
-          if (response.signedIn === "true"){ //isAuthorized state true if signIn is true
-            setAuthenticated(true);
-            setRole(response.userInfo.role)
-            setCurrentUserInfo(response.userInfo)
-          }
-          if (response.message === 'Email not found') {
-            setMessage('Email not found, maybe you would like to sign in instead?')
-            openAlertDialog();
-            return;
-          }
-          if (response.message === 'Incorrect Password') {
-            setMessage('Incorrect Password')
-            openAlertDialog();
-            return;
-          }
         })
+      }).then(res => {
+        return res.json();
+      }).then(response => {
+        if (response.signedIn === "true") { //isAuthorized state true if signIn is true
+          setAuthenticated(true);
+          setRole(response.userInfo.role)
+          setCurrentUserInfo(response.userInfo)
+        }
+        if (response.message === 'Email not found') {
+          setMessage('Email not found, maybe you would like to sign in instead?')
+          openAlertDialog();
+          return;
+        }
+        if (response.message === 'Incorrect Password') {
+          setMessage('Incorrect Password')
+          openAlertDialog();
+          return;
+        }
+      })
         .catch(error => {
           console.log(error.message);
         });
@@ -98,13 +105,13 @@ export default function SignInSide() {
   };
 
   if (authenticated === true) { //if authorized redirect user to their dashboard
-    if(role === "customer"){
+    if (role === "customer") {
       return <Navigate replace to="/dashboard" />;
     }
-    if(role === "admin"){
+    if (role === "admin") {
       return <Navigate replace to="/admin-dashboard" />;
     }
-  } 
+  }
 
   return (
     <ThemeProvider theme={theme}>

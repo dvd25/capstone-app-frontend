@@ -2,13 +2,18 @@ import * as React from 'react';
 import axios from 'axios'
 import { useEffect, useReducer } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useContext } from 'react';
+import { CustomContext } from "../../context/Context";
+import { useNavigate } from 'react-router-dom'
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import Link from '@mui/material/Link';
 import Chart from './Chart';
 import ActiveMembers from './MembersCard';
@@ -32,12 +37,16 @@ const mdTheme = createTheme();
 
 function DashboardContent() {
 
+  let navigate = useNavigate();
+
   const initialState = {
     loading: true, //true when loading and no data in post
     tasks: [], //empty
     error: ''
   }
-  
+
+  const { fetchCallCount, setAuthenticated, currentUserInfo, setCurrentUserInfo,} = useContext(CustomContext)
+
   const taskReducer = (taskState, action) => { // reducer function for fetching api
     switch (action.type) {
       case 'FETCH_SUCCESS':
@@ -119,13 +128,22 @@ function DashboardContent() {
 
     fetchTaskData();
     fetchUserData();
-  }, [])
+  }, [fetchCallCount])
+
+  const handleSignout = () => { //handles the event from clicking Signout button
+    setAuthenticated(false); //set global authenticated state
+    //reset current user info to empty
+    setCurrentUserInfo({})
+    setTimeout(function () { navigate("/signIn"); }, 1000);
+  }
   //console.log(userState)
-  const TASK_CARD_PROPS = {tasks: taskState.tasks, users: userState.tasks}
+  const TASK_CARD_PROPS = { tasks: taskState.tasks, users: userState.tasks }
   return (
     <ThemeProvider theme={mdTheme}>
+
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
+
         <Box
           component="main"
           sx={{
@@ -137,9 +155,19 @@ function DashboardContent() {
             height: '100vh',
             overflow: 'auto',
           }}
-        >
+        > <Stack
+          sx={{ pt: 4 }}
+          direction="row"
+          spacing={2}
+          justifyContent="center"
+        > 
+            <Button type="submit" onClick={handleSignout}
+              variant="contained"
+              sx={{ mt: 1, mb: 1 }}
+              style={{ background: 'orange' }}>Sign out</Button>
+          </Stack>
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth="lg" sx={{ mt: 1, mb: 4 }}>
             <Grid container spacing={3}>
               {/* Chart */}
               <Grid item xs={12} md={8} lg={6}>
@@ -164,7 +192,7 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <ActiveMembers users={userState.tasks}/>
+                  <ActiveMembers users={userState.tasks} />
                 </Paper>
               </Grid>
               <Grid item xs={12} md={4} lg={3}>
@@ -176,13 +204,13 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <TasksCard data={TASK_CARD_PROPS}/>
+                  <TasksCard data={TASK_CARD_PROPS} />
                 </Paper>
               </Grid>
               {/* Total Tasks */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
+                  <Orders tasks={taskState.tasks} />
                 </Paper>
               </Grid>
             </Grid>
