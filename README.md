@@ -16,8 +16,12 @@
 
 ## How to run
 
-    - Clone to your local or copy to your local.
+    - Clone this frontend project to your local.
+    - In the project directory, run 
+     npm start
+    
+    - Clone the back end application to your local: https://github.com/dvd25/Capstone-Backend   
     - In the project directory, run 
      npm start
 
-    - Clone the back end application and follow the same steps.
+The app and its functionality should be ready to use.
