@@ -21,9 +21,9 @@
      npm install (if there are peer dependecy issues with npm install, you can try npm install --legacy-peer-deps)
      npm start
      your default browser should automatically open to localhost:3000
+    - Should be functional as long as the backend server is live on AWS.
     
-    
-    - Backend Repository: https://github.com/dvd25/Capstone-Backend   
+    - Backend Repository: https://github.com/dvd25/Capstone-Backend if you would like to check out the code.
     - There is no need to connect it manually as backend is hosted on AWS elasticbeanstalk: http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/
 
 The app and its functionality should be ready to use.
