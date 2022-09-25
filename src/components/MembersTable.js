@@ -312,7 +312,7 @@ export default function EnhancedTable(props) {
         const data = new FormData(event.currentTarget)
         console.log(data)
         try {
-            fetch(`http://localhost:8080/api/users/members/${currentId}`, {
+            fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/members/${currentId}`, {
                 method: "PUT",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -419,7 +419,7 @@ export default function EnhancedTable(props) {
     const [userState, userDispatch] = useReducer(userReducer, initialState) //useReducer hook for api call
     useEffect(() => {
 
-        const USER_API_URL = currentUserInfo.role === 'superadmin' ? 'http://localhost:8080/api/users/' : 'http://localhost:8080/api/users/customers'
+        const USER_API_URL = currentUserInfo.role === 'superadmin' ? 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/' : 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/customers'
 
         //fetches all users
         const fetchUserData = () => {

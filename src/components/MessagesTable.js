@@ -296,7 +296,7 @@ export default function EnhancedTable(props) {
         const data = new FormData(event.currentTarget)
         console.log(data)
         try {
-            fetch(`http://localhost:8080/api/messages/update/${currentId}`, {
+            fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/messages/update/${currentId}`, {
               method: "PUT",
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -400,7 +400,7 @@ export default function EnhancedTable(props) {
     const [userState, userDispatch] = useReducer(userReducer, initialState) //useReducer hook for api call
     useEffect(() => {
 
-        const USER_API_URL = 'http://localhost:8080/api/messages/'
+        const USER_API_URL = 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/messages/'
 
         //fetches all users
         const fetchUserData = () => {

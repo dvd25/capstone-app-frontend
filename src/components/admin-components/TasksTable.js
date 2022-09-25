@@ -321,7 +321,7 @@ export default function EnhancedTable(props) {
     const data = new FormData(event.currentTarget)
     console.log(data)
     try {
-      fetch(`http://localhost:8080/api/tasks/${currentTaskId}`, {
+      fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/tasks/${currentTaskId}`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

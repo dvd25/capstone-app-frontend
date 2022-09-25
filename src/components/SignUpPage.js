@@ -54,7 +54,7 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
-      fetch("http://localhost:8080/api/users/", {
+      fetch("http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

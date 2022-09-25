@@ -211,7 +211,7 @@ const EnhancedTableToolbar = (props) => {
   function handleDeleteSelected (selected) {
 
     try {
-      selected.forEach((task)=> fetch(`http://localhost:8080/api/tasks/${task}`, {
+      selected.forEach((task)=> fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/tasks/${task}`, {
         method: "DELETE",
         headers: { 'Content-Type': 'application/json' }
       }).then(res => {
@@ -350,7 +350,7 @@ export default function EnhancedTable(props) {
     const data = new FormData(event.currentTarget)
     console.log(data)
     try {
-      fetch(`http://localhost:8080/api/tasks/${currentTaskId}`, {
+      fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/tasks/${currentTaskId}`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

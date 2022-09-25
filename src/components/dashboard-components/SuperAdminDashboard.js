@@ -107,9 +107,9 @@ function DashboardContent() {
   const [messageState, messageDispatch] = useReducer(messageReducer, initialState) //useReducer hook for api call
   //fetching all tasks to use for all the child components
   useEffect(() => {
-    const TASK_API_URL = 'http://localhost:8080/api/tasks/'
-    const USER_API_URL = 'http://localhost:8080/api/users/'
-    const MESSAGE_API_URL = 'http://localhost:8080/api/messages/'
+    const TASK_API_URL = 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/tasks/'
+    const USER_API_URL = 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/'
+    const MESSAGE_API_URL = 'http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/messages/'
 
     const fetchTaskData = () => {
       try {

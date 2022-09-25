@@ -68,7 +68,7 @@ export default function SignInSide() {
     }
 
     try {
-      fetch("http://localhost:8080/api/users/login", {
+      fetch("http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/login", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

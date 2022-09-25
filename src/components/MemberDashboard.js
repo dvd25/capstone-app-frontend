@@ -72,7 +72,7 @@ export default function MemberDashboard() {
         const lastName = data.get('lastName').length === 0 ? currentUserInfo.lastName : data.get('lastName');
 
         try {
-          fetch(`http://localhost:8080/api/users/${currentUserInfo.id}`, {
+          fetch(`http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/users/${currentUserInfo.id}`, {
             method: "PUT",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

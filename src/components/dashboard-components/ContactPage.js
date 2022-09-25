@@ -70,7 +70,7 @@ function ContactPage(props) {
                 console.log('FAILED...', err);
             });
             try {
-                fetch("http://localhost:8080/api/messages/", {
+                fetch("http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/api/messages/", {
                   method: "POST",
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
