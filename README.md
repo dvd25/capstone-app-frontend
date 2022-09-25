@@ -18,9 +18,10 @@
 
     - Clone this frontend project to your local.
     - In the project directory, run
-     npm install
+     npm install (if there are peer dependecy issues with npm install, you can try npm install --legacy-peer-deps)
      npm start
      your default browser should automatically open to localhost:3000
+     your backend should be hosted on localhost:8080
     
     - Clone the back end application to your local: https://github.com/dvd25/Capstone-Backend   
     - Follow the instructions in the backend repository.
