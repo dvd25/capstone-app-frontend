@@ -17,8 +17,10 @@
 ## How to run
 
     - Clone this frontend project to your local.
-    - In the project directory, run 
+    - In the project directory, run
+     npm install
      npm start
+     your default browser should automatically open to localhost:3000
     
     - Clone the back end application to your local: https://github.com/dvd25/Capstone-Backend   
     - In the project directory, run 

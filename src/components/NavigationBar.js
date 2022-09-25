@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useContext } from "react";
+import { useNavigate } from 'react-router-dom'
 import { CustomContext } from "../context/Context";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -17,7 +18,9 @@ import CapstoneIcon from '@mui/icons-material/ChangeHistory';
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
-  const { authenticated, currentUserInfo } = useContext(CustomContext);
+  let navigate = useNavigate();
+
+  const { authenticated, currentUserInfo,setCurrentUserInfo, setAuthenticated } = useContext(CustomContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -26,6 +29,13 @@ const ResponsiveAppBar = () => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  const handleSignout = () => { //handles the event from clicking Signout button
+    setAuthenticated(false); //set global authenticated state
+    //reset current user info to empty
+    setCurrentUserInfo({})
+    navigate("/signIn");
+  }
 
   return (
     <AppBar position="sticky" style={{ background: '#2E3B55' }}>
@@ -94,6 +104,10 @@ const ResponsiveAppBar = () => {
               <MenuItem component={NavLink} to="/admin-dashboard" key='admin' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Admin Dashboard</Typography>
               </MenuItem> : null}
+              {authenticated && currentUserInfo.role === 'superadmin' ?
+              <MenuItem component={NavLink} to="/super-admin-dashboard" key='admin' onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">Super Admin Dashboard</Typography>
+              </MenuItem> : null}
               <MenuItem component={NavLink} to="/contact" key='contact' onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Contact Us</Typography>
               </MenuItem>
@@ -150,6 +164,14 @@ const ResponsiveAppBar = () => {
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Admin Dashboard
             </Button> : null}
+            {authenticated && currentUserInfo.role === 'superadmin' ?
+            <Button
+              key='admin-dashboard'
+              onClick={handleCloseNavMenu}
+              component={NavLink} to="/super-admin-dashboard"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Super Admin Dashboard
+            </Button> : null}
             <Button
               key='contact'
               onClick={handleCloseNavMenu}
@@ -157,6 +179,15 @@ const ResponsiveAppBar = () => {
               sx={{ my: 2, color: 'white', display: 'block' }}
             > Contact Us
             </Button>
+          </Box>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent:"flex-end", alignItems:"flex-end" }}>
+            {authenticated?<Button
+              key='home'
+              onClick={handleSignout}
+              component={NavLink} to="/"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            > Signout
+            </Button>: null}
           </Box>
 
         </Toolbar>

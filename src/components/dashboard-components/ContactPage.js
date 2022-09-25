@@ -1,12 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -37,6 +34,17 @@ function Copyright(props) {
 const theme = createTheme();
 function ContactPage(props) {
 
+    const [open, setOpen] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+
+    const openAlertDialog = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => { //close dialog box
+        setOpen(false);
+    };
+
     const [toSend, setToSend] = useState({
         from_name: '',
         to_name: '',
@@ -50,13 +58,40 @@ function ContactPage(props) {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log(data.get('description'))
-        setToSend({ from_name: data.get('name'), to_name: 'admin', number: data.get('number'), email: data.get('email'), message: data.get('description'), reply_to: 'reply to' })
+        setToSend({ from_name: data.get('name'), to_name: 'Capstone Admin', number: data.get('number'), email: data.get('email'), message: data.get('description'), reply_to: 'reply to' })
+        console.log(toSend)
         send('service_v1yms9g', 'template_xyovbdd', toSend, 'BZDMgWPp4yzOEfhNZ')
             .then((response) => {
                 console.log('SUCCESS!', response.status, response.text);
+                setMessage("Message successfully sent. It may take up to 2 business days for a reply.")
+                console.log(message)
+                openAlertDialog();
             }, (err) => {
                 console.log('FAILED...', err);
             });
+            try {
+                fetch("http://localhost:8080/api/messages/", {
+                  method: "POST",
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userId: 0,
+                    description: data.get('description'),
+                    email: data.get('email'),
+                    name: data.get('name'),
+                    number: data.get('number'),
+                  })
+                }).then(res => {
+                  return res.json();
+                }).then(response => {
+                  console.log('Successfully added message to database')
+                })
+                  .catch(error => {
+                    console.log(error.message);
+                  });
+          
+              } catch (error) {
+                console.log(error.message)
+              }
     };
 
     return (
@@ -139,6 +174,26 @@ function ContactPage(props) {
                     </Box>
                 </Box>
                 <Copyright sx={{ mt: 5 }} />
+                <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Alert Dialog"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {message}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} autoFocus>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
             </Container>
 
         </ThemeProvider>

@@ -33,7 +33,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
 
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -42,10 +41,6 @@ function descendingComparator(a, b, orderBy) {
     return 1;
   }
   return 0;
-}
-
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function getComparator(order, orderBy) {
@@ -96,6 +91,7 @@ const status = [
 ];
 
 const priorityArray = [1, 2, 3, 4, 5]
+
 
 const headCells = [
   {
@@ -208,27 +204,6 @@ const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
   const { selected, setSelected, setFetchCallCount} = useContext(CustomContext)
 
-  function handleDeleteSelected (selected) {
-
-    try {
-      selected.forEach((task)=> fetch(`http://localhost:8080/api/tasks/${task}`, {
-        method: "DELETE",
-        headers: { 'Content-Type': 'application/json' }
-      }).then(res => {
-        if (!res.ok) throw new Error(res.status);
-        else return res.json();
-      }).then(response => {
-        console.log("Task deleted")
-        setFetchCallCount(prevState => prevState + 1);
-      })
-        .catch(error => {
-          console.log(error.message);
-        }))
-    } catch (error) {
-      console.log(error.message)
-    }
-  }
-
   return (
     <Toolbar
       sx={{
@@ -262,7 +237,7 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton onClick={() => handleDeleteSelected(selected)}>
+          <IconButton onClick={() => { console.log(selected) }}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -286,7 +261,7 @@ export default function EnhancedTable(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   //const [selected, setSelected] = React.useState([]);
-  const { selected, setSelected, setFetchCallCount } = useContext(CustomContext)
+  const { selected, setSelected, setFetchCallCount, currentUserInfo } = useContext(CustomContext)
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -298,7 +273,7 @@ export default function EnhancedTable(props) {
   const [currentPlaceholder, setCurrentPlaceholder] = React.useState('');
   const [currentComments, setCurrentComments] = React.useState('');
   const [currentPriority, setCurrentPriority] = React.useState('');
-  const [currentAssignee, setCurrentAssignee] = React.useState('');
+  const [setCurrentAssignee] = React.useState('');
   const [currentTaskId, setCurrentTaskId] = React.useState('');
 
   const handleCategoryChange = (event) => {
@@ -319,10 +294,6 @@ export default function EnhancedTable(props) {
 
   const handlePriorityChange = (event) => {
     setCurrentPriority(event.target.value);
-  };
-
-  const handleAssigneeChange = (event) => {
-    setCurrentAssignee(event.target.value);
   };
 
   //dialog post form
@@ -358,7 +329,7 @@ export default function EnhancedTable(props) {
           description: currentDescription,
           comments: currentComments,
           status: currentStatus,
-          assignedTo: currentAssignee,
+          assignedTo: currentUserInfo.id,
           priority: currentPriority
         })
       }).then(res => {
@@ -479,7 +450,7 @@ export default function EnhancedTable(props) {
                           }}
                         />
                       </TableCell>
-                      <TableCell align= "right"
+                      <TableCell
                         component="th"
                         id={labelId}
                         scope="row"
@@ -487,12 +458,12 @@ export default function EnhancedTable(props) {
                       >
                         {row.taskId}
                       </TableCell>
-                      <TableCell align="right">{capitalizeFirstLetter(row.category)}</TableCell>
-                      <TableCell align="right">{capitalizeFirstLetter(row.status)}</TableCell>
+                      <TableCell align="right">{row.category}</TableCell>
+                      <TableCell align="right">{row.status}</TableCell>
                       <TableCell align="right">{row.assignedTo}</TableCell>
                       <TableCell align="right">{row.priority}</TableCell>
-                      <TableCell align="right">{capitalizeFirstLetter(row.description)}</TableCell>
-                      <TableCell align="right">{capitalizeFirstLetter(row.comments)}</TableCell>
+                      <TableCell align="right">{row.description}</TableCell>
+                      <TableCell align="right">{row.comments}</TableCell>
                       <TableCell align="right"><Button color='success' onClick={() => handleClickOpenForm(row)}>Edit</Button></TableCell>
                     </TableRow>
                   );
@@ -542,6 +513,7 @@ export default function EnhancedTable(props) {
                             ))}
                           </TextField>
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
                           <TextField
                             id="outlined-select-status"
@@ -576,25 +548,7 @@ export default function EnhancedTable(props) {
                             ))}
                           </TextField>
                         </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            id="outlined-select-priority"
-                            select
-                            fullWidth
-                            label="Assign To"
-                            value={currentAssignee}
-                            onChange={handleAssigneeChange}
-                            helperText="Assign To"
-                          >
-                            {priorityArray.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        </Grid>
-
+                      
                         <Grid item xs={12}>
                           <TextField
                             fullWidth

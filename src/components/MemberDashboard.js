@@ -5,7 +5,6 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -14,7 +13,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink } from 'react-router-dom';
 import { useContext } from "react";
 import { CustomContext } from "../context/Context";
-import { useNavigate } from 'react-router-dom'
+
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -39,10 +38,8 @@ const theme = createTheme();
 
 export default function MemberDashboard() {
 
-    let navigate = useNavigate();
-
     //if unauthenticated will redirect users to sign in page
-    const { currentUserInfo, setCurrentUserInfo, setAuthenticated } = useContext(CustomContext);
+    const { currentUserInfo, setCurrentUserInfo} = useContext(CustomContext);
 
     //alert dialog to notify users that their signout is successful
     const [open, setOpen] = React.useState(false);
@@ -64,14 +61,6 @@ export default function MemberDashboard() {
     const handleCloseForm = () => {
         setOpenForm(false);
     };
-
-    const handleSignout = () => { //handles the event from clicking Signout button
-        setAuthenticated(false); //set global authenticated state
-        setCurrentUserInfo({}); //reset current user info to empty
-        setMessage('You have successfully signed out. Automatically redirecting you to sign in page..')
-        openAlertDialog(); // 
-        setTimeout(function () { navigate("/signIn"); }, 2000);
-    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -139,17 +128,7 @@ export default function MemberDashboard() {
                         <Typography variant="h5" align="center" color="text.secondary" paragraph>
                             Hi, you are now signed as {currentUserInfo.firstName + " " + currentUserInfo.lastName}
                         </Typography>
-                        <Stack
-                            sx={{ pt: 4 }}
-                            direction="row"
-                            spacing={2}
-                            justifyContent="center"
-                        >
-                            <Button type="submit" onClick={handleSignout}
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                                style={{ background: 'orange' }}>Sign out</Button>
-                        </Stack>
+  
                     </Container>
                 </Box>
                 <Container sx={{ py: 8 }} maxWidth="lg">

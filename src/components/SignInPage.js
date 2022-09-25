@@ -108,6 +108,10 @@ export default function SignInSide() {
     if (role === "customer") {
       return <Navigate replace to="/dashboard" />;
     }
+    if (role === "superadmin") {
+      return <Navigate replace to="/super-admin-dashboard" />;
+    }
+
     if (role === "admin") {
       return <Navigate replace to="/admin-dashboard" />;
     }
