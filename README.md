@@ -30,3 +30,11 @@ The app and its functionality should be ready to use.
 
 Sign In Page
 ![Sign In Page](https://user-images.githubusercontent.com/52621164/222099414-81b80602-5cc6-4fd7-b99f-06e51de8683e.png)
+
+Admin Dashboard View
+![Admin Dashboard](https://user-images.githubusercontent.com/52621164/222110332-24399fe8-7450-489f-a298-b48f8aea6f18.png)
+
+Members Table
+![image](https://user-images.githubusercontent.com/52621164/222110447-09017f70-ee85-4b42-a4b1-8e53be4f29d8.png)
+
+
