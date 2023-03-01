@@ -27,3 +27,6 @@
     - There is no need to connect it manually as backend is hosted on AWS elasticbeanstalk: http://capstonefitnessbackend-env.eba-izrrrwby.ap-southeast-2.elasticbeanstalk.com/
 
 The app and its functionality should be ready to use.
+
+Sign In Page
+![Sign In Page](https://user-images.githubusercontent.com/52621164/222099414-81b80602-5cc6-4fd7-b99f-06e51de8683e.png)
