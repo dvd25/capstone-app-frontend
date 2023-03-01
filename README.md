@@ -37,4 +37,6 @@ Admin Dashboard View
 Members Table
 ![image](https://user-images.githubusercontent.com/52621164/222110447-09017f70-ee85-4b42-a4b1-8e53be4f29d8.png)
 
+Adding Task
+![image](https://user-images.githubusercontent.com/52621164/222123465-625d59f7-3aa4-4043-a1ad-2cfd70a89f77.png)
 
